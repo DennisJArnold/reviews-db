@@ -3,10 +3,11 @@ const queries = require('../database/queries.js')
 const cors = require('cors');
 
 const app = express()
-const port = 3000
+const port = 3001
 
 app.use(cors());
 app.use(express.json());
+
 
 app.get('/reviews/meta', (req, res) => {
     let id = req.query.product_id;
@@ -32,14 +33,15 @@ app.get('/reviews', (req, res) => {
           res.status(400).send(err)
       } else {
           console.log('Get Requests for reviews recieved')
-          res.send(data.rows)
+          res.send(data)
       }
   })
 })
 
 app.put('/reviews/:id/helpful', (req, res) => {
-    console.log(req.params)
+    console.log('PUT params:', req.params)
     let id = req.params.id;
+    console.log(req.params);
     queries.markHelpful(id, (err, data) => {
         if (err) {
             console.log('Error with helpful request', err)

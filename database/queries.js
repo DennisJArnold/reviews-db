@@ -47,8 +47,7 @@ const getReviewsByPage = (id, count, page, sort, cb) => {
       if (err) {
         cb(err, null);
       } else {
-        console.log(results);
-        cb(null, results);
+        cb(null, results.rows);
       }
     })
 }
@@ -57,7 +56,7 @@ const insertReview = (review, cb) => {
   let { product_id, name, summary, body, rating, recommend } = review;
   let date = JSON.stringify(new Date());
   
-  client.query(`INSERT INTO reviews (product_id, reviewer_name, summary, body, date, rating, recommend) VALUES ('${product_id}', '${name}', '${summary}', '${body}', '${date}', '${rating}', '${recommend}') RETURNING reviews_id`, (err, results) => {
+  client.query(`INSERT INTO reviews (product_id, reviewer_name, summary, body, date, rating, recommend, helpfulness) VALUES ('${product_id}', '${name}', '${summary}', '${body}', '${date}', '${rating}', '${recommend}', ${0}) RETURNING reviews_id`, (err, results) => {
     if (err) {
       cb(err, null);
     } else {
@@ -109,7 +108,6 @@ const reportReview = (id, cb) => {
       cb(null, results);
     }
   })
-
 }
 
 // get reviews meta (reviewID)
@@ -138,15 +136,19 @@ const getReviewsMeta = (id, cb) => {
     if (err) {
       cb(err, null);
     } else {
+      let avgCounters = {};
+      let avgSums = {}
       results.rows.forEach((row) => {
         meta.ratings[row.rating] = meta.ratings[row.rating] + 1 || 1;
         meta.recommended[row.recommend] = meta.recommended[row.recommend] + 1 || 1;
         row.characteristic_vals.forEach((char) => {
-          meta.characteristics[char.name] = meta.characteristics[char.name] + char.value || char.value;
+          meta.characteristics[char.name] = char;
+          avgSums[char.name] = avgSums[char.name] + char.value || char.value;
+          avgCounters[char.name] = avgCounters[char.name] + 1 || 1;
         })
       })
       for (let key in meta.characteristics) {
-        meta.characteristics[key] /= results.rows.length;
+        meta.characteristics[key].value = avgSums[key]/avgCounters[key];
       }
       cb(null, meta);
     }
