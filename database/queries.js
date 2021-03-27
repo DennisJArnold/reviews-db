@@ -61,6 +61,7 @@ const insertReview = (review, cb) => {
   
   client.query(`INSERT INTO reviews (product_id, reviewer_name, summary, body, date, rating, recommend, helpfulness) VALUES ('${product_id}', '${name}', '${summary}', '${body}', '${date}', '${rating}', '${recommend}', ${0}) RETURNING reviews_id`, (err, results) => {
     if (err) {
+      console.log(err);
       cb(err, null);
     } else {
       let reviewId = results.rows[0].reviews_id;

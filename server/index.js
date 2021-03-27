@@ -80,6 +80,11 @@ app.post('/reviews', (req, res) => {
     });
 })
 
+// Loader.io verification
+app.get('/loaderio-3fefcac8e0215475a3a8d6fa62f94c67', (req, res) => {
+    res.send('loaderio-3fefcac8e0215475a3a8d6fa62f94c67');
+});
+
 app.get('/', (req, res) => res.json({ message: 'Hello World' }))
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
